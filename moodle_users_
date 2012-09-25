@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2012 Ruslan Kabalin, Lancaster University, UK
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; version 2 dated June,
+# 1991.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301 USA.
+
+=head1 NAME
+
+moodle_users_ - Plugin to monitor the number of logged-in users
+
+=head1 CONFIGURATION
+
+Configuration is done through libpq environment variables, for example PGUSER,
+PGHOST, etc. But generally it is easier if you run the plugin on the database
+server as postgres user. For more information, see L<Munin::Plugin::Pgsql> and
+L<http://munin-monitoring.org/wiki/plugin-conf.d>.
+
+You may configure the period for which the number of users is calulated via
+env.timetoshowusers configuration variable. By default is set to 300 sec (5
+min).
+
+You need to specify the name of the moodle database via symlink to the plugin,
+i.e.  moodle_users_<databasename>.
+
+=head1 SEE ALSO
+
+L<Munin::Plugin::Pgsql>
+L<http://munin-monitoring.org/wiki/plugin-conf.d>
+
+=head1 MAGIC MARKERS
+
+ #%# family=auto
+ #%# capabilities=autoconf suggest
+
+=head1 AUTHOR
+
+Copyright (C) 2012 Ruslan Kabalin, Lancaster University, UK
+
+=head1 COPYRIGHT/License.
+
+Copyright (C) 2012 Ruslan Kabalin, Lancaster University, UK
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation; version 2
+dated June, 1991.
+
+=cut
+
+use strict;
+use warnings;
+
+use Munin::Plugin::Pgsql;
+use POSIX;
+
+my $timetoshowusers = 300;
+$timetoshowusers = $ENV{"timetoshowusers"} if ($ENV{"timetoshowusers"});
+
+my $timefrom = 100 * floor((time()-$timetoshowusers) / 100);
+
+my $pg = Munin::Plugin::Pgsql->new(
+    basename => 'moodle_users_',
+    paramdatabase => 1,
+    category => 'Moodle',
+    title    => 'Moodle users',
+    info     => 'Number of logged-in users',
+    vlabel   => 'Users',
+    pivotquery => 1,
+    basequery => "SELECT count(id) AS users FROM mdl_user WHERE lastaccess > $timefrom",
+    configquery => "SELECT 'users', 'Users'",
+    graphdraw => 'AREA',
+    stack     => 1
+);
+
+$pg->Process();
+
+exit(0);
