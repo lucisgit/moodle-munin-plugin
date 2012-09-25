@@ -79,6 +79,7 @@ $mdlprefix = $ENV{"mdlprefix"} if ($ENV{"mdlprefix"});
 
 my $timefrom = 100 * floor((time()-$timetoshowusers) / 100);
 
+# Number of logged-in users
 print "multigraph mdlusers\n";
 
 my $pg = Munin::Plugin::Pgsql->new(
@@ -92,11 +93,11 @@ my $pg = Munin::Plugin::Pgsql->new(
     basequery => "SELECT count(id) AS users FROM ${mdlprefix}user WHERE lastaccess > $timefrom",
     configquery => "SELECT 'users', 'Users'",
     graphdraw => 'AREA',
-    stack     => 1
 );
 
 $pg->Process();
 
+# The total size of moodle users files
 print "\n";
 print "multigraph mdlfiles\n";
 
