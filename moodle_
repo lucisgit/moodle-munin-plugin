@@ -19,7 +19,7 @@
 
 =head1 NAME
 
-moodle_users_ - Plugin to monitor the number of logged-in users
+moodle_ - Plugin for monitoring various Moodle stats
 
 =head1 CONFIGURATION
 
@@ -63,16 +63,21 @@ dated June, 1991.
 use strict;
 use warnings;
 
+use Munin::Plugin;
 use Munin::Plugin::Pgsql;
 use POSIX;
+
+need_multigraph();
 
 my $timetoshowusers = 300;
 $timetoshowusers = $ENV{"timetoshowusers"} if ($ENV{"timetoshowusers"});
 
 my $timefrom = 100 * floor((time()-$timetoshowusers) / 100);
 
+print "multigraph mdlusers\n";
+
 my $pg = Munin::Plugin::Pgsql->new(
-    basename => 'moodle_users_',
+    basename => 'moodle_',
     paramdatabase => 1,
     category => 'Moodle',
     title    => 'Moodle users',
@@ -83,6 +88,27 @@ my $pg = Munin::Plugin::Pgsql->new(
     configquery => "SELECT 'users', 'Users'",
     graphdraw => 'AREA',
     stack     => 1
+);
+
+$pg->Process();
+
+print "\n";
+print "multigraph mdlfiles\n";
+
+$pg = Munin::Plugin::Pgsql->new(
+    basename => 'moodle_',
+    paramdatabase => 1,
+    category => 'Moodle',
+    title    => 'Moodle disk usage',
+    info     => 'The total size of moodle user files',
+    vlabel   => 'Size',
+    pivotquery => 1,
+    basequery => "SELECT SUM(iq.filesize) AS totalbytes FROM
+        (SELECT filesize FROM mdl_files GROUP BY filesize, contenthash) iq",
+    configquery => "SELECT 'totalbytes', 'Totalbytes'",
+    graphdraw => 'AREA',
+    stack     => 1,
+    base     => 1024
 );
 
 $pg->Process();
