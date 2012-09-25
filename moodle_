@@ -32,6 +32,9 @@ You may configure the period for which the number of users is calulated via
 env.timetoshowusers configuration variable. By default is set to 300 sec (5
 min).
 
+Use env.mdlprefix if you use different from 'mdl_' (mdl_tablename) prefix in
+database tables.
+
 You need to specify the name of the moodle database via symlink to the plugin,
 i.e.  moodle_users_<databasename>.
 
@@ -71,6 +74,8 @@ need_multigraph();
 
 my $timetoshowusers = 300;
 $timetoshowusers = $ENV{"timetoshowusers"} if ($ENV{"timetoshowusers"});
+my $mdlprefix = 'mdl_';
+$mdlprefix = $ENV{"mdlprefix"} if ($ENV{"mdlprefix"});
 
 my $timefrom = 100 * floor((time()-$timetoshowusers) / 100);
 
@@ -84,7 +89,7 @@ my $pg = Munin::Plugin::Pgsql->new(
     info     => 'Number of logged-in users',
     vlabel   => 'Users',
     pivotquery => 1,
-    basequery => "SELECT count(id) AS users FROM mdl_user WHERE lastaccess > $timefrom",
+    basequery => "SELECT count(id) AS users FROM ${mdlprefix}user WHERE lastaccess > $timefrom",
     configquery => "SELECT 'users', 'Users'",
     graphdraw => 'AREA',
     stack     => 1
@@ -104,7 +109,7 @@ $pg = Munin::Plugin::Pgsql->new(
     vlabel   => 'Size',
     pivotquery => 1,
     basequery => "SELECT SUM(iq.filesize) AS totalbytes FROM
-        (SELECT filesize FROM mdl_files GROUP BY filesize, contenthash) iq",
+        (SELECT filesize FROM ${mdlprefix}files GROUP BY filesize, contenthash) iq",
     configquery => "SELECT 'totalbytes', 'Totalbytes'",
     graphdraw => 'AREA',
     stack     => 1,
