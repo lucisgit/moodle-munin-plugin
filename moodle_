@@ -106,15 +106,36 @@ $pg = Munin::Plugin::Pgsql->new(
     paramdatabase => 1,
     category => 'Moodle',
     title    => 'Moodle disk usage',
-    info     => 'The total size of moodle user files',
+    info     => 'The total size of moodle users files',
     vlabel   => 'Size',
     pivotquery => 1,
     basequery => "SELECT SUM(iq.filesize) AS totalbytes FROM
         (SELECT filesize FROM ${mdlprefix}files GROUP BY filesize, contenthash) iq",
     configquery => "SELECT 'totalbytes', 'Totalbytes'",
     graphdraw => 'AREA',
-    stack     => 1,
     base     => 1024
+);
+
+$pg->Process();
+
+# The total number of users in active chat sessions
+print "\n";
+print "multigraph mdlchats\n";
+
+$pg = Munin::Plugin::Pgsql->new(
+    basename => 'moodle_',
+    paramdatabase => 1,
+    category => 'Moodle',
+    title    => 'Moodle chatting users',
+    info     => 'The total number of users in active chat sessions',
+    vlabel   => 'Users',
+    basequery => "SELECT 'chatusers', COUNT(DISTINCT userid) FROM
+        ${mdlprefix}chat_users WHERE lastping > $timefrom
+        UNION ALL
+        SELECT 'activechatusers', COUNT(DISTINCT userid) FROM
+        ${mdlprefix}chat_users WHERE lastmessageping > $timefrom",
+    configquery => "VALUES ('chatusers','Users connected'),('activechatusers','Users posting messages')",
+    stack     => 1
 );
 
 $pg->Process();
