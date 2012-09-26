@@ -143,4 +143,23 @@ $pg = Munin::Plugin::Pgsql->new(
 
 $pg->Process();
 
+# The number of assignment submissions
+print "\n";
+print "multigraph mdlassign\n";
+
+$pg = Munin::Plugin::Pgsql->new(
+    basename => 'moodle_',
+    paramdatabase => 1,
+    category => 'Moodle',
+    title    => 'Moodle assignment submissions',
+    info     => 'The mumber of assignment submissions',
+    vlabel   => 'Assignments',
+    pivotquery => 1,
+    basequery => "SELECT count(id) AS assign
+        FROM ${mdlprefix}assign_submission WHERE timemodified > $timefrom AND status = 'submitted'",
+    configquery => "VALUES ('assign','Assignments submitted')",
+);
+
+$pg->Process();
+
 exit(0);
