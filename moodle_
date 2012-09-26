@@ -91,7 +91,7 @@ my $pg = Munin::Plugin::Pgsql->new(
     vlabel   => 'Users',
     pivotquery => 1,
     basequery => "SELECT count(id) AS users FROM ${mdlprefix}user WHERE lastaccess > $timefrom",
-    configquery => "SELECT 'users', 'Users'",
+    configquery => "VALUES ('users', 'Users')",
     graphdraw => 'AREA',
 );
 
