@@ -139,7 +139,6 @@ $pg = Munin::Plugin::Pgsql->new(
         SELECT 'activechatusers', COUNT(DISTINCT userid) FROM
         ${mdlprefix}chat_users WHERE lastmessageping > $timefrom",
     configquery => "VALUES ('chatusers','Users connected'),('activechatusers','Users posting messages')",
-    stack     => 1
 );
 
 $pg->Process();
