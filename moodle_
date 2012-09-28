@@ -117,7 +117,7 @@ $pg = Munin::Plugin::Pgsql->new(
         'Video'), ('image', 'Image'), ('text', 'Text')",
     graphdraw => 'AREA',
     base     => 1024,
-    stack    => 1
+    stack    => 1,
 );
 
 $pg->Process();
@@ -152,12 +152,18 @@ $pg = Munin::Plugin::Pgsql->new(
     paramdatabase => 1,
     category => 'Moodle',
     title    => 'Moodle assignment submissions',
-    info     => 'The mumber of assignment submissions',
-    vlabel   => 'Assignments',
-    pivotquery => 1,
-    basequery => "SELECT count(id) AS assign
-        FROM ${mdlprefix}assign_submission WHERE timemodified > $timefrom AND status = 'submitted'",
-    configquery => "VALUES ('assign','Assignments submitted')",
+    info     => 'The mumber of submissions',
+    vlabel   => 'Submissions',
+    basequery => "SELECT 'assign', COUNT(id)
+        FROM ${mdlprefix}assign_submission WHERE timemodified > $timefrom AND status = 'submitted'
+        UNION ALL
+        SELECT 'turnitin', COUNT(id)
+        FROM ${mdlprefix}turnitintool_submissions
+        WHERE submission_modified > $timefrom AND submission_status LIKE '%successfully%'",
+    configquery => "VALUES ('assign','Assignments submitted'), ('turnitin',
+        'Turnitin assignments submitted')",
+    graphdraw => 'AREA',
+    stack    => 1,
 );
 
 $pg->Process();
