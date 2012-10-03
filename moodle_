@@ -28,15 +28,23 @@ PGHOST, etc. But generally it is easier if you run the plugin on the database
 server as postgres user. For more information, see L<Munin::Plugin::Pgsql> and
 L<http://munin-monitoring.org/wiki/plugin-conf.d>.
 
-You may configure the period for which the number of users is calulated via
-env.timetoshowusers configuration variable. By default is set to 300 sec (5
-min).
+In order to make this plugin work, you need to specify the name of the moodle
+database via symlink to the plugin, i.e. moodle_users_<databasename>. For more
+information see L<http://munin-monitoring.org/wiki/WildcardPlugins>.
 
-Use env.mdlprefix if you use different from 'mdl_' (mdl_tablename) prefix in
-database tables.
+Plugin configuration variables:
 
-You need to specify the name of the moodle database via symlink to the plugin,
-i.e.  moodle_users_<databasename>.
+env.updatetime - you may configure the period for which the time-based data is
+calculated (e.g. used in the number of logged-in users reporting or
+assignments submissions). By default the value of 300 sec is used  (5 min
+Munin default update interval).
+
+env.mdlprefix - if you use different from 'mdl_' (mdl_tablename) prefix in
+database tables, pass the correct one using this parameter.
+
+env.modturnitintool - if you have Turnitintool module installed, you may add
+it to assignment monitoring by setting this variable to 1. Disabled by
+default.
 
 =head1 SEE ALSO
 
