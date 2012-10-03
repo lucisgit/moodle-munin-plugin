@@ -72,12 +72,13 @@ use POSIX;
 
 need_multigraph();
 
-my $timetoshowusers = 300;
-$timetoshowusers = $ENV{"timetoshowusers"} if ($ENV{"timetoshowusers"});
+# Initial settings
+my $updatetime = 300;
+$updatetime = $ENV{"updatetime"} if (defined $ENV{"updatetime"});
 my $mdlprefix = 'mdl_';
-$mdlprefix = $ENV{"mdlprefix"} if ($ENV{"mdlprefix"});
+$mdlprefix = $ENV{"mdlprefix"} if (defined $ENV{"mdlprefix"});
 
-my $timefrom = 100 * floor((time()-$timetoshowusers) / 100);
+my $timefrom = 100 * floor((time()-$updatetime) / 100);
 
 # Number of logged-in users
 print "multigraph mdlusers\n";
