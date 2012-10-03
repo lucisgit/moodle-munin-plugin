@@ -1,0 +1,47 @@
+NAME
+    moodle_ - Plugin for generating various Moodle stats (Moodle 2.3 and
+    above)
+
+CONFIGURATION
+    Configuration is done through libpq environment variables, for example
+    PGUSER, PGHOST, etc. But generally it is easier if you run the plugin on
+    the database server as postgres user. For more information, see
+    Munin::Plugin::Pgsql and
+    <http://munin-monitoring.org/wiki/plugin-conf.d>.
+
+    In order to make this plugin work, you need to specify the name of the
+    moodle database via symlink to the plugin, i.e.
+    moodle_users_<databasename>. For more information see
+    <http://munin-monitoring.org/wiki/WildcardPlugins>.
+
+    Plugin configuration variables:
+
+    env.updatetime - you may configure the period for which the time-based
+    data is calculated (e.g. used in the number of logged-in users reporting
+    or assignments submissions). By default the value of 300 sec is used (5
+    min Munin default update interval).
+
+    env.mdlprefix - if you use different from 'mdl_' (mdl_tablename) prefix
+    in database tables, pass the correct one using this parameter.
+
+    env.modturnitintool - if you have Turnitintool module installed, you may
+    add it to assignment monitoring by setting this variable to 1. Disabled
+    by default.
+
+SEE ALSO
+    Munin::Plugin::Pgsql <http://munin-monitoring.org/wiki/plugin-conf.d>
+
+MAGIC MARKERS
+     #%# family=auto
+     #%# capabilities=autoconf suggest
+
+AUTHOR
+    Copyright (C) 2012 Ruslan Kabalin, Lancaster University, UK
+
+COPYRIGHT/License.
+    Copyright (C) 2012 Ruslan Kabalin, Lancaster University, UK
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; version 2 dated June, 1991.
+
