@@ -19,7 +19,7 @@
 
 =head1 NAME
 
-moodle_ - Plugin for monitoring various Moodle stats
+moodle_ - Plugin for generating various Moodle stats (Moodle 2.3 and above)
 
 =head1 CONFIGURATION
 
