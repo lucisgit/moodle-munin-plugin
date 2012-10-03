@@ -77,6 +77,8 @@ my $updatetime = 300;
 $updatetime = $ENV{"updatetime"} if (defined $ENV{"updatetime"});
 my $mdlprefix = 'mdl_';
 $mdlprefix = $ENV{"mdlprefix"} if (defined $ENV{"mdlprefix"});
+my $modturnitintool = 0;
+$modturnitintool = $ENV{"modturnitintool"} if (defined $ENV{"modturnitintool"});
 
 my $timefrom = 100 * floor((time()-$updatetime) / 100);
 
@@ -148,6 +150,20 @@ $pg->Process();
 print "\n";
 print "multigraph mdlassign\n";
 
+my $basequery = "SELECT 'assign', COUNT(id)
+    FROM ${mdlprefix}assign_submission WHERE timemodified > $timefrom AND
+    status = 'submitted'";
+my $configquery = "VALUES ('assign','Assignments submitted')";
+
+# Add extra graph is turnitin is enabled
+if ($modturnitintool) {
+    $basequery .= "\nUNION ALL
+        SELECT 'turnitin', COUNT(id)
+        FROM ${mdlprefix}turnitintool_submissions
+        WHERE submission_modified > $timefrom AND submission_status LIKE '%successfully%'";
+    $configquery .= ", ('turnitin', 'Turnitin assignments submitted')";
+}
+
 $pg = Munin::Plugin::Pgsql->new(
     basename => 'moodle_',
     paramdatabase => 1,
@@ -155,14 +171,8 @@ $pg = Munin::Plugin::Pgsql->new(
     title    => 'Moodle assignment submissions',
     info     => 'The mumber of submissions',
     vlabel   => 'Submissions',
-    basequery => "SELECT 'assign', COUNT(id)
-        FROM ${mdlprefix}assign_submission WHERE timemodified > $timefrom AND status = 'submitted'
-        UNION ALL
-        SELECT 'turnitin', COUNT(id)
-        FROM ${mdlprefix}turnitintool_submissions
-        WHERE submission_modified > $timefrom AND submission_status LIKE '%successfully%'",
-    configquery => "VALUES ('assign','Assignments submitted'), ('turnitin',
-        'Turnitin assignments submitted')",
+    basequery => $basequery,
+    configquery => $configquery,
     graphdraw => 'AREA',
     stack    => 1,
 );
