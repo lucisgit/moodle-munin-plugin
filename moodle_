@@ -108,6 +108,60 @@ my $pg = Munin::Plugin::Pgsql->new(
 
 $pg->Process();
 
+# Number of unique logged-in users since
+print "\n";
+print "multigraph uniquemdluserssince\n";
+
+$pg = Munin::Plugin::Pgsql->new(
+    basename => 'moodle_',
+    paramdatabase => 1,
+    category => 'Moodle',
+    title    => 'Unique Moodle users since...',
+    info     => 'Number of unique logged-in users seen since a given time',
+    vlabel   => 'Users',
+    pivotquery => 1,
+    basequery => "SELECT
+        (SELECT count('x') FROM ${mdlprefix}user WHERE lastaccess > extract(epoch from date_trunc('day',   now()))) AS day,
+        (SELECT count('x') FROM ${mdlprefix}user WHERE lastaccess > extract(epoch from date_trunc('week',  now()))) AS week,
+        (SELECT count('x') FROM ${mdlprefix}user WHERE lastaccess > extract(epoch from date_trunc('month', now()))) AS month
+    ;",
+    configquery => "VALUES
+        ('day', 'Since midnight'),
+        ('week', 'Since monday'),
+        ('month', 'Since start of month')
+    ",
+    graphdraw => 'LINE1',
+);
+
+$pg->Process();
+
+# Number of unique logged-in users over period
+print "\n";
+print "multigraph uniquemdlusersoverperiod\n";
+
+$pg = Munin::Plugin::Pgsql->new(
+    basename => 'moodle_',
+    paramdatabase => 1,
+    category => 'Moodle',
+    title    => 'Unique Moodle users over period',
+    info     => 'Number of unique logged-in users seen over a fixed period',
+    vlabel   => 'Users',
+    pivotquery => 1,
+    basequery => "SELECT
+        (SELECT count('x') FROM ${mdlprefix}user WHERE lastaccess > extract(epoch from now() - INTERVAL '1 day'))AS day,
+        (SELECT count('x') FROM ${mdlprefix}user WHERE lastaccess > extract(epoch from now() - INTERVAL '1 week')) AS week,
+        (SELECT count('x') FROM ${mdlprefix}user WHERE lastaccess > extract(epoch from now() - INTERVAL '1 month')) AS month
+    ;",
+    configquery => "VALUES
+        ('day',   'In the past 24 hours'),
+        ('week',  'In the past week'),
+        ('month', 'In the past month')
+    ",
+    graphdraw => 'LINE1',
+);
+
+$pg->Process();
+
 # The total size of moodle users files
 print "\n";
 print "multigraph mdlfiles\n";
