@@ -10,8 +10,8 @@ CONFIGURATION
     <http://munin-monitoring.org/wiki/plugin-conf.d>.
 
     In order to make this plugin work, you need to specify the name of the
-    moodle database via symlink to the plugin, i.e.
-    moodle_users_<databasename>. For more information see
+    moodle database via symlink to the plugin, i.e.  moodle_<databasename>.
+    For more information see
     <http://munin-monitoring.org/wiki/WildcardPlugins>.
 
     Plugin configuration variables:
