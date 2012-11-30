@@ -100,6 +100,7 @@ my $pg = Munin::Plugin::Pgsql->new(
     title    => 'Moodle users',
     info     => 'Number of logged-in users',
     vlabel   => 'Users',
+    extraconfig => 'graph_scale no',
     pivotquery => 1,
     basequery => "SELECT count(id) AS users FROM ${mdlprefix}user WHERE lastaccess > $timefrom",
     configquery => "VALUES ('users', 'Users')",
@@ -198,6 +199,7 @@ $pg = Munin::Plugin::Pgsql->new(
     title    => 'Moodle chatting users',
     info     => 'The total number of users in active chat sessions',
     vlabel   => 'Users',
+    extraconfig => 'graph_scale no',
     basequery => "SELECT 'chatusers', COUNT(DISTINCT userid) FROM
         ${mdlprefix}chat_users WHERE lastping > $timefrom
         UNION ALL
@@ -233,6 +235,7 @@ $pg = Munin::Plugin::Pgsql->new(
     title    => 'Moodle assignment submissions',
     info     => 'The mumber of submissions',
     vlabel   => 'Submissions',
+    extraconfig => 'graph_scale no',
     basequery => $basequery,
     configquery => $configquery,
     graphdraw => 'AREA',
